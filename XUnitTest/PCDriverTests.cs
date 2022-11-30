@@ -1,35 +1,74 @@
-﻿using System.Xml.Linq;
-using NewLife;
+﻿using NewLife;
 using NewLife.IoT.Drivers;
+using NewLife.IoT.ThingModels;
+using NewLife.IoT.ThingSpecification;
 using NewLife.PC.Drivers;
+using NewLife.Serialization;
 
 namespace XUnitTest;
 
+[TestCaseOrderer("NewLife.UnitTest.DefaultOrderer", "NewLife.UnitTest")]
 public class PCDriverTests
 {
     PCDriver _driver;
     INode _node;
+    ThingSpec _spec;
     public PCDriverTests()
     {
         _driver = new PCDriver();
     }
 
     [Fact]
+    public void GetSpecificationTest()
+    {
+        _spec = _driver.GetSpecification();
+        Assert.NotNull(_spec);
+    }
+
+    [Fact]
     public void OpenTest()
     {
         _node = _driver.Open(null, null);
+        Assert.NotNull(_node);
     }
 
     [Fact]
     public void ReadTest()
     {
+        var spec = _driver.GetSpecification();
+        var points = spec.Properties.Select(e => new PointModel { Name = e.Id }).ToArray();
+        var rs = _driver.Read(_node, points);
 
+        Assert.NotNull(rs);
+        Assert.Equal(points.Length, rs.Count);
+
+        var mi = JsonHelper.Convert<MachineInfo>(rs);
+        Assert.True(mi.CpuRate > 0);
+        Assert.True(mi.Memory > 0);
+        Assert.True(mi.AvailableMemory > 0);
     }
 
     [Fact]
     public void ControlTest()
     {
+        var model = new ServiceModel { Name = "Speak", InputData = "好好学习" };
+        _driver.Control(_node, model.ToDictionary());
+    }
 
+    [Fact]
+    public void ControlTest2()
+    {
+        var model = new ServiceModel { Name = "Reboot", InputData = "1213" };
+        Assert.Throws<NotSupportedException>(() => _driver.Control(_node, model.ToDictionary()));
+
+        PCDriver.EnableReboot = true;
+    }
+
+    [Fact]
+    public void ControlTest3()
+    {
+        var model3 = new ServiceModel { Name = "abcd", InputData = "1213" };
+        Assert.Throws<NotImplementedException>(() => _driver.Control(_node, model3.ToDictionary()));
     }
 
     [Fact]
@@ -39,7 +78,7 @@ public class PCDriverTests
         Thread.Sleep(1000);
     }
 
-    [Fact]
+    [Fact(Skip = "跳过")]
     public void RebootTest()
     {
         var rs = _driver.Reboot(60);
@@ -48,41 +87,5 @@ public class PCDriverTests
         Thread.Sleep(1000);
 
         "shutdown".ShellExecute("-a");
-    }
-
-    [Fact]
-    public void GetSpecificationTest()
-    {
-
-    }
-
-    [Fact]
-    public void CreateTest()
-    {
-
-    }
-
-    [Fact]
-    public void CreateTest1()
-    {
-
-    }
-
-    [Fact]
-    public void CreateTest2()
-    {
-
-    }
-
-    [Fact]
-    public void CreateTest3()
-    {
-
-    }
-
-    [Fact]
-    public void CreateTest4()
-    {
-
     }
 }

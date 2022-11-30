@@ -45,7 +45,6 @@
 
   <ItemGroup>
     <PackageReference Include="NewLife.IoT" Version="1.5.2022.1101" />
-    <PackageReference Include="System.Speech" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

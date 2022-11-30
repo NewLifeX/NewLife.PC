@@ -18,6 +18,11 @@ namespace NewLife.PC.Drivers;
 [DisplayName("PC驱动")]
 public class PCDriver : DriverBase<Node, PCParameter>
 {
+    #region 属性
+    /// <summary>是否启用重启。默认false</summary>
+    public static Boolean EnableReboot { get; set; }
+    #endregion
+
     #region 方法
     /// <summary>读取数据</summary>
     /// <param name="node">节点对象，可存储站号等信息，仅驱动自己识别</param>
@@ -57,6 +62,7 @@ public class PCDriver : DriverBase<Node, PCParameter>
                 Speak(service.InputData);
                 break;
             case nameof(Reboot):
+                if (!EnableReboot) throw new NotSupportedException("未启用重启功能");
                 Reboot(service.InputData.ToInt());
                 break;
             default:
