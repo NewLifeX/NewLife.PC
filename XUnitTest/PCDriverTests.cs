@@ -42,7 +42,7 @@ public class PCDriverTests
     [Fact]
     public void RebootTest()
     {
-        var rs = _driver.Reboot(15);
+        var rs = _driver.Reboot(60);
         Assert.True(rs > 0);
 
         Thread.Sleep(1000);
