@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewLife.PC", "NewLife.PC\NewLife.PC.csproj", "{8FE72179-D931-4130-AC75-D499205CFB8A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTest", "XUnitTest\XUnitTest.csproj", "{64BDB91E-0B31-4EDD-AD11-8D83A1A3CD82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{8FE72179-D931-4130-AC75-D499205CFB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FE72179-D931-4130-AC75-D499205CFB8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FE72179-D931-4130-AC75-D499205CFB8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64BDB91E-0B31-4EDD-AD11-8D83A1A3CD82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64BDB91E-0B31-4EDD-AD11-8D83A1A3CD82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64BDB91E-0B31-4EDD-AD11-8D83A1A3CD82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64BDB91E-0B31-4EDD-AD11-8D83A1A3CD82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

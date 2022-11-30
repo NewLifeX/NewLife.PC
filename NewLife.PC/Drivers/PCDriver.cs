@@ -72,7 +72,21 @@ public class PCDriver : DriverBase<Node, PCParameter>
     /// <summary>重启计算机</summary>
     /// <param name="timeout"></param>
     [DisplayName("重启计算机")]
-    public void Reboot(Int32 timeout) => "shutdown".ShellExecute($"-r -t {timeout}");
+    public Int32 Reboot(Int32 timeout)
+    {
+        if (Runtime.Windows)
+        {
+            var p = "shutdown".ShellExecute($"-r -t {timeout}");
+            return p?.Id ?? 0;
+        }
+        else if (Runtime.Linux)
+        {
+            var p = "reboot".ShellExecute();
+            return p?.Id ?? 0;
+        }
+
+        return -1;
+    }
 
     /// <summary>发现本地节点</summary>
     /// <returns></returns>
