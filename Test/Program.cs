@@ -1,11 +1,11 @@
 ﻿using NewLife.IoT.Drivers;
 using NewLife.IoT.ThingModels;
 using NewLife.Log;
-using NewLife.NetPing.Drivers;
+using NewLife.PC.Drivers;
 
 XTrace.UseConsole();
 
-var driver = new NetPingDriver();
+var driver = new PCDriver();
 var pm = new PCParameter();
 
 //var points = driver.GetDefaultPoints();
