@@ -104,13 +104,13 @@ public class PCDriver : DriverBase<Node, PCParameter>
 
         var pis = typeof(MachineInfo).GetProperties();
 
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "CpuRate")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "Memory")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "AvailableMemory")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "UplinkSpeed")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "DownlinkSpeed")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "Temperature")));
-        points.Add(Create(pis.FirstOrDefault(e => e.Name == "Battery")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "CpuRate")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "Memory")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "AvailableMemory")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "UplinkSpeed")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "DownlinkSpeed")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "Temperature")));
+        points.Add(PropertySpec.Create(pis.FirstOrDefault(e => e.Name == "Battery")));
         spec.Properties = points.Where(e => e != null).ToArray();
 
         // 只读
@@ -119,112 +119,11 @@ public class PCDriver : DriverBase<Node, PCParameter>
             item.AccessMode = "r";
         }
 
-        services.Add(Create(Speak));
-        services.Add(Create(Reboot));
+        services.Add(ServiceSpec.Create(Speak));
+        services.Add(ServiceSpec.Create(Reboot));
         spec.Services = services.Where(e => e != null).ToArray();
 
         return spec;
-    }
-
-    /// <summary>快速创建属性</summary>
-    /// <param name="member"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
-    public static PropertySpec Create(MemberInfo member, Int32 length = 0)
-    {
-        if (member == null) return null;
-
-        var ps = new PropertySpec
-        {
-            Id = member.Name,
-            Name = member.GetDisplayName() ?? member.GetDescription(),
-        };
-
-        if (member is PropertyInfo pi)
-            ps.DataType = new TypeSpec { Type = pi.PropertyType.Name };
-        if (member is FieldInfo fi)
-            ps.DataType = new TypeSpec { Type = fi.FieldType.Name };
-
-        if (length > 0 && ps.DataType != null)
-            ps.DataType.Specs = new DataSpecs { Length = length };
-
-        return ps;
-    }
-
-    /// <summary>快速创建属性</summary>
-    /// <param name="id">标识</param>
-    /// <param name="name">名称</param>
-    /// <param name="type">类型</param>
-    /// <param name="length">长度</param>
-    /// <param name="address">点位地址</param>
-    /// <returns></returns>
-    public static PropertySpec Create(String id, String name, String type, Int32 length = 0, String address = null)
-    {
-        var ps = new PropertySpec
-        {
-            Id = id,
-            Name = name,
-            Address = address
-        };
-
-        if (type != null)
-        {
-            ps.DataType = new TypeSpec { Type = type };
-
-            if (length > 0)
-                ps.DataType.Specs = new DataSpecs { Length = length };
-        }
-
-        return ps;
-    }
-
-    /// <summary>快速创建服务</summary>
-    /// <param name="delegate"></param>
-    /// <returns></returns>
-    public static ServiceSpec Create(Delegate @delegate) => Create(@delegate.Method);
-
-    /// <summary>快速创建服务</summary>
-    /// <param name="method"></param>
-    /// <returns></returns>
-    public static ServiceSpec Create(MethodBase method)
-    {
-        if (method == null) return null;
-
-        var ss = new ServiceSpec
-        {
-            Id = method.Name,
-            Name = method.GetDisplayName() ?? method.GetDescription(),
-        };
-
-        var pis = method.GetParameters();
-        if (pis.Length > 0)
-        {
-            var ps = new List<PropertySpec>();
-            foreach (var pi in pis)
-            {
-                ps.Add(Create(pi));
-            }
-
-            ss.InputData = ps.Where(e => e != null).ToArray();
-        }
-
-        return ss;
-    }
-
-    /// <summary>快速创建属性</summary>
-    /// <param name="member"></param>
-    /// <returns></returns>
-    public static PropertySpec Create(ParameterInfo member)
-    {
-        if (member == null) return null;
-
-        var ps = new PropertySpec
-        {
-            Id = member.Name,
-            DataType = new TypeSpec { Type = member.ParameterType.Name }
-        };
-
-        return ps;
     }
     #endregion
 }
