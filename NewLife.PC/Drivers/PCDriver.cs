@@ -51,7 +51,7 @@ public class PCDriver : DriverBase<Node, PCParameter>
     /// <summary>设备控制</summary>
     /// <param name="node"></param>
     /// <param name="parameters"></param>
-    public override void Control(INode node, IDictionary<String, Object> parameters)
+    public override Object Control(INode node, IDictionary<String, Object> parameters)
     {
         var service = JsonHelper.Convert<ServiceModel>(parameters);
         if (service == null || service.Name.IsNullOrEmpty()) throw new NotImplementedException();
@@ -63,11 +63,12 @@ public class PCDriver : DriverBase<Node, PCParameter>
                 break;
             case nameof(Reboot):
                 if (!EnableReboot) throw new NotSupportedException("未启用重启功能");
-                Reboot(service.InputData.ToInt());
-                break;
+                return Reboot(service.InputData.ToInt()) + "";
             default:
                 throw new NotImplementedException();
         }
+
+        return "OK";
     }
 
     /// <summary>语音播报</summary>
@@ -98,7 +99,16 @@ public class PCDriver : DriverBase<Node, PCParameter>
     /// <returns></returns>
     public override ThingSpec GetSpecification()
     {
-        var spec = new ThingSpec();
+        var type = GetType();
+        var spec = new ThingSpec
+        {
+            Profile = new Profile
+            {
+                Version = type.Assembly.GetName().Version + "",
+                ProductKey = type.GetCustomAttribute<DriverAttribute>().Name
+            }
+        };
+
         var points = new List<PropertySpec>();
         var services = new List<ServiceSpec>();
 

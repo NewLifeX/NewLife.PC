@@ -23,6 +23,18 @@ public class PCDriverTests
     {
         _spec = _driver.GetSpecification();
         Assert.NotNull(_spec);
+
+        Assert.NotNull(_spec.Profile);
+        Assert.Equal("PC", _spec.Profile.ProductKey);
+        Assert.NotEmpty(_spec.Profile.Version);
+
+        var ps = _spec.Properties;
+        Assert.NotNull(ps);
+        Assert.Equal(7, ps.Length);
+
+        Assert.NotNull(_spec.Services);
+        Assert.Null(_spec.Events);
+        Assert.Null(_spec.ExtendedProperties);
     }
 
     [Fact]
@@ -52,7 +64,10 @@ public class PCDriverTests
     public void ControlTest()
     {
         var model = new ServiceModel { Name = "Speak", InputData = "好好学习" };
-        _driver.Control(_node, model.ToDictionary());
+        var rs = _driver.Control(_node, model.ToDictionary());
+        Assert.NotNull(rs);
+
+        Thread.Sleep(1000);
     }
 
     [Fact]
@@ -75,7 +90,7 @@ public class PCDriverTests
     public void SpeakTest()
     {
         _driver.Speak("学无先后达者为师");
-        Thread.Sleep(1000);
+        Thread.Sleep(3000);
     }
 
     [Fact(Skip = "跳过")]
