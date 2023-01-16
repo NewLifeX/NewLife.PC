@@ -35,6 +35,7 @@ public class PCDriver : DriverBase<Node, PCParameter>
         if (points == null || points.Length == 0) return dic;
 
         var mi = MachineInfo.GetCurrent();
+        mi.Refresh();
 
         foreach (var pi in mi.GetType().GetProperties())
         {
