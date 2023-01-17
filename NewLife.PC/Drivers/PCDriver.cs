@@ -84,6 +84,8 @@ public class PCDriver : DriverBase<Node, PCParameter>
     {
         if (Runtime.Windows)
         {
+            // shutdown -r -t 123 -c "IoTEdge"
+            // 需要注意，该操作有可能被火绒等安全软件拦截
             var p = "shutdown".ShellExecute($"-r -t {timeout}");
             return p?.Id ?? 0;
         }
