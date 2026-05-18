@@ -32,9 +32,9 @@ var point2 = new PointModel
 };
 
 var dic = driver.Read(node, new[] { point, point2 });
-foreach (var item in dic)
+for (var i = 0; i < dic.Points.Length; i++)
 {
-    XTrace.WriteLine("{0}\t= {1}", item.Key, item.Value);
+    XTrace.WriteLine("{0}\t= {1}", dic.Points[i].Name, dic.Values[i]);
 }
 
 driver.Close(node);

@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
-using System.Reflection;
 using NewLife.IoT.Drivers;
 using NewLife.IoT.ThingModels;
 using NewLife.IoT.ThingSpecification;
 using NewLife.Reflection;
-using NewLife.Serialization;
 
 namespace NewLife.PC.Drivers;
 
@@ -27,49 +25,55 @@ public class PCDriver : DriverBase<Node, PCParameter>
     /// <summary>读取数据</summary>
     /// <param name="node">节点对象，可存储站号等信息，仅驱动自己识别</param>
     /// <param name="points">点位集合，Address属性地址示例：D100、C100、W100、H100</param>
-    /// <returns></returns>
-    public override IDictionary<String, Object> Read(INode node, IPoint[] points)
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>读取结果</returns>
+    public override Task<ReadResult> ReadAsync(INode node, IPoint[] points, CancellationToken cancellationToken = default)
     {
-        var dic = new Dictionary<String, Object>();
-
-        if (points == null || points.Length == 0) return dic;
+        if (points == null || points.Length == 0)
+            return TaskEx.FromResult(ReadResult.Success([], []));
 
         var mi = MachineInfo.GetCurrent();
         mi.Refresh();
+
+        var resultPoints = new List<IPoint>();
+        var resultValues = new List<Object?>();
 
         foreach (var pi in mi.GetType().GetProperties())
         {
             var point = points.FirstOrDefault(e => e.Name.EqualIgnoreCase(pi.Name));
             if (point != null)
             {
-                dic[point.Name] = mi.GetValue(pi);
+                resultPoints.Add(point);
+                resultValues.Add(mi.GetValue(pi));
             }
         }
 
-        return dic;
+        return TaskEx.FromResult(ReadResult.Success([.. resultPoints], [.. resultValues]));
     }
 
-    /// <summary>设备控制</summary>
-    /// <param name="node"></param>
-    /// <param name="parameters"></param>
-    public override Object Control(INode node, IDictionary<String, Object> parameters)
+    /// <summary>控制设备</summary>
+    /// <param name="node">节点对象</param>
+    /// <param name="request">控制请求，携带服务名和输入参数</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>控制结果</returns>
+    public override Task<ControlResult> ControlAsync(INode node, ControlRequest request, CancellationToken cancellationToken = default)
     {
-        var service = JsonHelper.Convert<ServiceModel>(parameters);
-        if (service == null || service.Name.IsNullOrEmpty()) throw new NotImplementedException();
+        if (request == null || request.ServiceName.IsNullOrEmpty()) throw new NotImplementedException();
 
-        switch (service.Name)
+        switch (request.ServiceName)
         {
             case nameof(Speak):
-                Speak(service.InputData);
-                break;
+                var text = request.Parameters.TryGetValue("text", out var t) ? t + "" : "";
+                Speak(text);
+                return TaskEx.FromResult(ControlResult.Success());
             case nameof(Reboot):
                 if (!EnableReboot) throw new NotSupportedException("未启用重启功能");
-                return Reboot(service.InputData.ToInt()) + "";
+                var timeout = request.Parameters.TryGetValue("timeout", out var to) ? to.ToInt() : 0;
+                var pid = Reboot(timeout);
+                return TaskEx.FromResult(ControlResult.Success(new Dictionary<String, Object?> { ["pid"] = pid }));
             default:
                 throw new NotImplementedException();
         }
-
-        return "OK";
     }
 
     /// <summary>语音播报</summary>
@@ -98,20 +102,11 @@ public class PCDriver : DriverBase<Node, PCParameter>
         return -1;
     }
 
-    /// <summary>发现本地节点</summary>
-    /// <returns></returns>
-    public override ThingSpec GetSpecification()
+    /// <summary>填充产品物模型</summary>
+    /// <param name="spec">待填充的物模型对象</param>
+    /// <returns>是否填充成功</returns>
+    protected override Boolean OnGetSpecification(ThingSpec spec)
     {
-        var type = GetType();
-        var spec = new ThingSpec
-        {
-            Profile = new Profile
-            {
-                Version = type.Assembly.GetName().Version + "",
-                ProductKey = type.GetCustomAttribute<DriverAttribute>().Name
-            }
-        };
-
         var points = new List<PropertySpec>();
         var services = new List<ServiceSpec>();
 
@@ -136,7 +131,7 @@ public class PCDriver : DriverBase<Node, PCParameter>
         services.Add(ServiceSpec.Create(Reboot));
         spec.Services = services.Where(e => e != null).ToArray();
 
-        return spec;
+        return true;
     }
     #endregion
 }
