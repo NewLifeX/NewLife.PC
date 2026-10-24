@@ -10,7 +10,9 @@ on:
 jobs:
   build-test:
 
-    runs-on: ubuntu-latest
+    # 单元测试会真实调用语音播报与 WMI（MachineInfo），只能跑在 Windows；发包流程见 publish.yml（Ubuntu）
+    runs-on: windows-latest
+    timeout-minutes: 20
 
     steps:
     - uses: actions/checkout@v4
@@ -24,6 +26,6 @@ jobs:
           9.x
           10.x
     - name: Build
-      run: dotnet build -c Release
+      run: dotnet build NewLife.PC.slnx -c Release
     - name: Test
-      run: dotnet test -c Release
+      run: dotnet test NewLife.PC.slnx -c Release --no-build

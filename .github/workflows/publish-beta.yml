@@ -7,6 +7,10 @@ on:
         - 'NewLife.PC/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-publish:
 
@@ -23,12 +27,14 @@ jobs:
           8.x
           9.x
           10.x
-    - name: Restore
-      run: |
-        dotnet restore NewLife.PC/NewLife.PC.csproj
     - name: Build
       run: |
-        dotnet pack --no-restore --version-suffix $(date "+%Y.%m%d-beta%H%M") -c Release -o out NewLife.PC/NewLife.PC.csproj
-    - name: Publish
+        dotnet pack --version-suffix $(date "+%Y.%m%d-beta%H%M") -c Release -o out NewLife.PC/NewLife.PC.csproj
+    - name: Publish to GitHub Packages
+      # 备用镜像渠道，失败只告警，不阻断 NuGet.org 测试版发布
+      continue-on-error: true
+      run: |
+        dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://nuget.pkg.github.com/NewLifeX/index.json --api-key ${{ github.token }}
+    - name: Publish to NuGet.org
       run: |
         dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nugetKey }}
