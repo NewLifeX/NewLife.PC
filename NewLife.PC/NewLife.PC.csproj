@@ -27,7 +27,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/NewLife.PC</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>物联网;IoT;边缘计算;Edge;新生命团队;NewLife;PLC;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>IoT驱动，符合IoT标准库的PC驱动，采集CPU、内存、网络等数据，提供语音播报和重启等服务。</PackageReleaseNotes>
+    <PackageReleaseNotes>升级 NewLife.IoT 至 3.2.2026.1024，驱动沿用异步 ReadAsync/ControlAsync 与结构化 ReadResult/ControlResult；依赖链升级 NewLife.Core 12.0，机器信息采集统一走 MachineInfo；解决方案升级为 .slnx 新格式，需要 VS 2022 17.10+ 或 .NET 9+ SDK；发布流程同时推送 GitHub Packages 与 NuGet.org，并按版本标签自动创建 GitHub Release</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.IoT" Version="3.0.2026.601" />
+    <PackageReference Include="NewLife.IoT" Version="3.2.2026.1024" />
   </ItemGroup>
 
   <ItemGroup>
